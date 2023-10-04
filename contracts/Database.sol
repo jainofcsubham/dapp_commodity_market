@@ -2,53 +2,50 @@
 
 pragma solidity ^0.8.9;
 
+import "./Data_Types.sol";
+
 contract Database{
 
-    struct User_Address{
-        string addr;
-        string contact_number;
-    }
 
-    struct User{
-        string name;
-        User_Address[] address_list;
-    }
-
-    struct Product {
-        uint256 product_id;
-        string product_name;
-        uint256 price;
-        uint256 stock;
-        uint max_limit_per_purchase;
-        uint delivery_charges;
-        address owner_id;
-        string[] tags;
-    }
-
-    struct Transaction {
-        string transaction_type; //[Buy,Refund]
-        uint256 transaction_id;
-        uint256 amount;
-        uint256 delivery_charges;
-        uint256 platform_fee;
-        uint256 convinience_fee;
-        uint256 token_charges; // Need to figure out how to put them in the DB.
-    }
-
-    struct Order {
-        uint256 order_id;
-        string order_status; // [Delivered, Cancelled, In Transit, Token Issued]
-        uint256 product_id;
-        uint256 quantity;
-        address buyer_id;
-        Transaction[] payment_detail;
-    }
 
     // Private data
-    mapping (address => User) private user_list;
-    mapping (uint => Product) private product_list;
-    mapping (uint => Order)  private order_list;
+    mapping (address => Data_Types.User) private user_list;
+    mapping (uint => Data_Types.Product) private product_list;
+    mapping (uint => Data_Types.Order)  private order_list;
+    // Need to check if this is needed or not.
+    mapping (uint => Data_Types.Transaction) private transaction_list;
 
-    
+    // Public functions accessible from the implementation contract
+
+    function addUser() public {
+        // Adds the user
+    }
+
+    function addProduct() public {
+
+    }
+
+    function placeOrder() public {
+
+    }
+
+    function cancelOrder() public {
+
+    }
+
+    function markAsDelivered() public {
+    }
+
+    function listProducts() public {
+
+    }
+
+    function addAddress() public {
+
+    }
+
+    function editAddress() public {
+
+    }
 
 }

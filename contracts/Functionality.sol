@@ -5,6 +5,6 @@ pragma solidity ^0.8.9;
 import "./Database.sol";
 
 
-contract Functionality{
+contract Functionality is Database{
 
 }
