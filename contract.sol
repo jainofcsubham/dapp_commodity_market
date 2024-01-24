@@ -166,4 +166,4 @@ contract commodity{
         emit BurnCheck(shop_No[_index].name, shop_No[_index].symbol, shop_No[_index].tokens.balanceChecker(msg.sender));
     }
     
-}
+}c dkncq m,d

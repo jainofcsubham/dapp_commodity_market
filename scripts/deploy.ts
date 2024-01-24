@@ -1,14 +1,36 @@
 import { ethers } from "hardhat";
 
+//npx hardhat run scripts/deploy.ts --network sepolia
+
 async function main() {
-  const [owner,from1,from2,from3] = await ethers.getSigners();
-  const second =await ethers.getContractFactory("Second");
-  const contract = await second.deploy();
+  const users = await ethers.getSigners();
+  const account = users[0];
+  const listOfUsers = users.slice(1,101);
+  console.log("Deploying contracts with the account:", account.address);
+  const token = await ethers.deployContract("Functionality");
+  console.log("Token address:", await token.getAddress());
 
-  await contract.waitForDeployment()
+  await token.registerUser("User_Name","User_Location","1234567890")
 
-  let sol = await contract.connect(from1).doProcess(5);
-  console.log("The  value is ",Number(sol));
+  const concurrentCalls =[]
+  for(let i=0;i<listOfUsers.length;i++){
+      concurrentCalls.push(
+        token.connect(listOfUsers[i]).buyProduct(1,3)
+      )
+  }
+
+  // This calls buyProduct function 100 times at once.
+  await Promise.all(concurrentCalls);
+
+  const buyProductBySingleUser = []
+  for(let i=0;i<100;i++){
+    buyProductBySingleUser.push(
+      token.connect(listOfUsers[0]).buyProduct(1,3)
+    )
+  }
+
+  // This calls buyProduct from a single account 100 times.
+  await Promise.all(buyProductBySingleUser);
 
 }
 

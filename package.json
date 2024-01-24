@@ -4,7 +4,9 @@
   "description": "Dapp for commodity market",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "npx hardhat test",
+    "compile" : "npx hardhat compile",
+    "deploy" : "npx hardhat run scripts/deploy.js --network "
   },
   "author": "",
   "license": "ISC",
