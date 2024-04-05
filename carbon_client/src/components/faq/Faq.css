@@ -1,0 +1,30 @@
+.faq_container{
+    width: 100%;
+}
+
+.faq_wrapper{
+    display: flex;
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 64px 48px;
+}
+
+.section_name{
+    margin-bottom: 16px;
+}
+
+.section_heading{
+    margin-bottom: 16px;
+}
+
+.question{
+    font-size: 20px;
+}
+
+.answer{
+    margin: 16px 0;
+}
+.faq_left_block{
+    margin-right: 60px;
+}

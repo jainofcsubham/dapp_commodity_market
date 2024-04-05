@@ -1,0 +1,104 @@
+.register_container {
+  display: flex;
+  width: 100%;
+  flex-grow: 1;
+}
+
+.register-form {
+  /* padding: 20px; */
+  max-width: 800px;
+  width: 100%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.form-group {
+  margin-bottom: 30px;
+  position: relative;
+
+}
+
+.register_error_msg{
+  position: absolute;
+  font-size: 12px;
+  top: 105%;
+  color: rgb(171 25 25);
+}
+
+.form-group label {
+  display: block;
+  /* font-weight: bold; */
+  margin-bottom: 5px;
+  color: #fff;
+}
+
+.form-group input, .form-group select {
+  min-width: 280px;
+  max-width: 400px;
+  width: 100%;
+  padding: 8px;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.form-group button {
+  background-color: #35452b;
+  color: #fff;
+  padding: 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  width: 100%;
+}
+
+.register_logo {
+  text-align: center;
+  font-size: 25px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.register_box {
+  background: #768350;
+  margin-top: 40px;
+  padding: 60px;
+  /* height: 400px; */
+}
+
+.register_title {
+  font-size: 18px;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 20px;
+  color: white;
+}
+
+.form_row {
+  display: flex;
+  justify-content: space-between;
+}
+
+
+.register_already_account {
+  display: flex;
+  justify-content: center;
+  font-size: 14px;
+  color: #302a2a;
+  flex-direction: column;
+  align-items: center;
+}
+
+.register_already_account_cta {
+  font-size: 14px;
+  text-align: center;
+  cursor: pointer;
+  border-bottom: 1px solid #302a2a;
+  margin-top: 5px;
+}
+
+.register_form_container{
+    padding: 0 40px;
+}
