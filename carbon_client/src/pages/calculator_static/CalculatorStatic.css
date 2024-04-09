@@ -1,0 +1,102 @@
+.question_container,.calculation_container{
+    display: flex;
+    flex-direction: column;
+    /* align-items: center;
+    justify-content: center; */
+    padding:  0 40px;
+    flex-grow: 1;
+}
+
+.category_title{
+    width: 100%;
+    font-size: 25px;
+    margin: 20px 0;
+}
+
+.form_container{
+    flex-grow: 1;
+}
+
+.question_footer{
+    display: flex;
+    justify-content: space-between;
+    margin-top: auto;
+    margin-bottom: 40px;
+    width: 100%;
+    align-items: center;
+}
+
+.back_button{
+    border: 1px solid #35452B;
+    border-radius: 48px;
+    padding: 8px 16px;
+    color: #35452B;
+    min-width: 150px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    cursor: pointer;
+    background-color: transparent;
+    margin: 0 20px 0 0;
+}
+
+.submit_button{
+    background-color: #35452B;
+    border-radius: 48px;
+    padding: 8px 16px;
+    color: white;
+    min-width: 150px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    cursor: pointer;
+    border: 1px solid #35452B;
+}
+
+.submit_button:hover{
+    background-color: #727D6B;
+}
+
+.calculation_container{
+    font-size: 40px;
+    justify-content: center;
+    align-items: center;
+}
+
+.title_box,.footer_title_box{
+    font-size: 30px;
+    margin: 30px 0;
+}
+
+.emission_box{
+    font-size: 40px;
+    font-weight: bold;
+}
+
+.footer_disclaimer{
+    font-style: italic;
+    font-weight: 10px;
+}
+
+.action_item_container{
+    display: flex;
+}
+
+.re_calculate_button{
+    max-width: 150px;
+    width: 100%;
+
+    background-color: #35452B;
+    border-radius: 48px;
+    padding: 8px 16px;
+    color: white;
+    display: flex;
+    justify-content: center;
+    cursor: pointer;
+    border: 1px solid #35452B;
+}
+
+.re_calculate_button:hover{
+    background-color: #727D6B;
+}
+

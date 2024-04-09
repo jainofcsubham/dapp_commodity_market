@@ -1,13 +1,11 @@
 import "./Login.css";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-import { useAxios } from "../../components/useAxios";
+import { useAxios } from "../../custom_hooks/useAxios";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-interface Credentials {
-  username: string;
-  password: string;
-}
+import { CredentialsType } from "../../types/Credentials.type";
+
 const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
 
 const schema = yup
@@ -35,14 +33,14 @@ export const Login = () => {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<Credentials>({
+  } = useForm<CredentialsType>({
     resolver: yupResolver(schema),
   });
 
   const { doCall } = useAxios();
   const nav = useNavigate();
 
-  const handleLogin: SubmitHandler<Credentials> = async (data) => {
+  const handleLogin: SubmitHandler<CredentialsType> = async (data) => {
     const res = await doCall({
       url: "/login",
       method: "POST",

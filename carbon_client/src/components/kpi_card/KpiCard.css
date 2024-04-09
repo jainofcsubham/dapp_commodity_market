@@ -1,0 +1,26 @@
+.kpi_card_wrapper{
+    border: 1px solid gray;
+    border-radius: 5px;
+    padding: 20px;
+    width: 100%;
+    position: relative;
+}
+
+.kpi_card_info{
+    position: absolute;
+    right: 10px;
+    top: 10px;
+}
+
+.kpi_card_info img {
+    width: 18px;
+}
+
+.kpi_card_label{
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+
+.kpi_card_value{
+    font-size: 35px;
+}

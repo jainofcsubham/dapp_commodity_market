@@ -2,20 +2,45 @@ import { useNavigate } from "react-router-dom";
 import "./Header.css";
 import avatar from "../../assets/avatar.png";
 import { Menu, MenuItem } from "@mui/material";
-import { useState } from "react";
+import { useContext, useState } from "react";
+import { UtilityContext } from "../../context/Utility.context";
+import { UtilityContextType } from "../../types/UtilityContext.type";
+import { ContractDetailsType } from "../../types/ContractDetails.type";
+import { Contract } from "ethers";
+import { HeaderType } from "../../types/Header.type";
+import logo from "../../assets/logo.svg";
+import { useSmartContract } from "../../custom_hooks/useSmartContract";
 
-interface HeaderProps {
-  isLoggedIn?: boolean;
-}
-
-export const Header = ({ isLoggedIn = false }: HeaderProps) => {
-
+export const Header = ({ isLoggedIn = false }: HeaderType) => {
+  const { connectWallet, contractDetails } =
+    useContext<UtilityContextType>(UtilityContext);
+  const { contract } = contractDetails;
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-
+  const { callSmartContractMethod } = useSmartContract();
   const navigate = useNavigate();
 
-  const goToLogin = () => {
-    navigate("/login");
+  const login = async (contract: Contract | null) => {
+    if (contract) {
+      const {
+        status,
+        data = "",
+        error = "",
+      } = await callSmartContractMethod(contract.loginUser);
+      if (status == "SUCCESS" && data) {
+        navigate("/dashboard/home");
+      } else {
+        console.log(error);
+      }
+    }
+  };
+
+  const checkAndLogin = async () => {
+    if (!contractDetails.contract) {
+      const { contract }: ContractDetailsType = await connectWallet();
+      await login(contract);
+    } else {
+      await login(contract);
+    }
   };
 
   const goToRegister = () => {
@@ -30,8 +55,12 @@ export const Header = ({ isLoggedIn = false }: HeaderProps) => {
     }
   };
 
-  const goToGroups = () => {
-    navigate("/dashboard/groups");
+  const goToOffset = () => {
+    navigate("/dashboard/offset");
+  };
+
+  const goToReports = () => {
+    navigate("/dashboard/reports");
   };
 
   const goToCalculator = () => {
@@ -41,22 +70,23 @@ export const Header = ({ isLoggedIn = false }: HeaderProps) => {
 
   const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
     setAnchorEl(event.currentTarget);
-    event.stopPropagation()
+    event.stopPropagation();
   };
   const handleClose = () => {
     setAnchorEl(null);
   };
 
   const onLogOut = () => {
-    navigate("/")
-  }
+    navigate("/");
+  };
 
   return (
     <>
       <div className="header_container">
         <div className="header_wrapper">
           <div className="logo" onClick={goToHome}>
-            CARBONCALC
+            <img src={logo} className="logo_img" alt="logo" />
+            EcoTrack
           </div>
           <div className="nav_bar">
             {isLoggedIn ? (
@@ -64,14 +94,15 @@ export const Header = ({ isLoggedIn = false }: HeaderProps) => {
                 <div className="nav_item" onClick={goToHome}>
                   Home
                 </div>
-                <div className="nav_item" onClick={goToGroups}>
-                  Groups
+                <div className="nav_item" onClick={goToReports}>
+                  Reports
+                </div>
+                <div className="nav_item" onClick={goToOffset}>
+                  Offset
                 </div>
                 <div className="nav_item" onClick={goToCalculator}>
                   Calculator
                 </div>
-                {/* <div className="nav_item">FAQ</div>
-                <div className="nav_item">Contact</div> */}
               </>
             ) : (
               <></>
@@ -80,26 +111,25 @@ export const Header = ({ isLoggedIn = false }: HeaderProps) => {
           {isLoggedIn ? (
             <>
               <div className="profile" onClick={handleClick}>
-                <div className="header_user_name">Hello User</div>
+                <div className="header_user_name">Hello {"User"}</div>
                 <div className="header_profile_pic_container">
                   <img className="header_profile_pic" src={avatar} />
                 </div>
-               
               </div>
               <Menu
-                  id="basic-menu"
-                  anchorEl={anchorEl}
-                  open={open}
-                  onClose={handleClose}
-                >
-                  <MenuItem onClick={onLogOut}>Log Out</MenuItem>
-                  {/* <MenuItem onClick={handleClose}>My account</MenuItem>
+                id="basic-menu"
+                anchorEl={anchorEl}
+                open={open}
+                onClose={handleClose}
+              >
+                <MenuItem onClick={onLogOut}>Log Out</MenuItem>
+                {/* <MenuItem onClick={handleClose}>My account</MenuItem>
                   <MenuItem onClick={handleClose}>Logout</MenuItem> */}
-                </Menu>
+              </Menu>
             </>
           ) : (
             <div className="action_bar">
-              <div className="action_item" onClick={goToLogin}>
+              <div className="action_item" onClick={checkAndLogin}>
                 Login
               </div>
               <div

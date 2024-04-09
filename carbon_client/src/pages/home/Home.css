@@ -1,0 +1,83 @@
+.home_wrapper{
+    padding: 0 40px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+
+}
+
+.home_kpi_container{
+    display: flex;
+    justify-content: space-around;
+    margin-top: 40px;
+    gap: 20px;
+}
+
+.home_tracker_header_title_wrapper{
+    margin: 40px 0;
+    font-size: 24px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.home_title_horizontal_line{
+    background-color: gray;
+    flex-grow: 1;
+    height: 1px;
+    border-radius: 10px;
+    margin-top: 5px;
+}
+
+.home_dialog_wrapper{
+    /* position: relative; */
+    display: flex;
+    flex-grow: 1;
+    flex-direction: column;
+    background-color: #FBF9EF;
+}
+
+.home_dialog_header{
+    display: flex;
+    justify-content: space-between;
+    padding: 16px 40px;
+    align-items: center;
+    border-bottom: 1px solid gray;
+    font-size: 24px;
+}
+
+.home_dialog_edit_date{
+    margin-left: 10px !important;
+}
+
+.home_edit_emission{
+    margin-left: 0px !important;
+}
+
+.home_reports{
+    display: flex;
+    gap: 20px;
+}
+
+.home_bar_chart{
+    border: 1px solid gray;
+    padding: 20px;
+    border-radius: 5px;
+}
+
+.home_donut_wrapper{
+    border: 1px solid gray;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+
+.home_donut_charts{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.home_tracker_body_wrapper{
+    margin-bottom: 40px;
+}

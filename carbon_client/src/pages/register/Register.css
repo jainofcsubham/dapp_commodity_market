@@ -102,3 +102,15 @@
 .register_form_container{
     padding: 0 40px;
 }
+.register_tabs{
+  margin-bottom: 20px;
+  padding: 0 40px;
+}
+
+.register_tabs  .MuiTabs-indicator{
+  background-color: white;
+}
+
+.register_tabs .Mui-selected{
+  color: white !important;
+}

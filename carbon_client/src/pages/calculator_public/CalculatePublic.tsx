@@ -1,12 +1,12 @@
 import { Header } from "../../components/header/Header";
-import { Calculator } from "../calculator/Calculator";
+import { CalculatorStatic } from "../calculator_static/CalculatorStatic";
 
 export const CalculatePublic = () => {
   return (
     <>
       <div className="page_wrapper">
         <Header />
-        <Calculator />
+        <CalculatorStatic />
       </div>
     </>
   );

@@ -1,0 +1,44 @@
+
+.category_heading{
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+
+.question_wrapper{
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.question_box{
+    max-width: 500px;
+    width: 100%;
+    margin-right: 40px;
+}
+
+.question_box{
+    font-size: 16px;
+}
+
+.number_input{
+    /* max-width: 400px; */
+    /* width: 100%; */
+    height: 40px;
+    padding: 5px;
+    font-size: 20px;
+    width: 100%;
+}
+
+.radio_input{
+    max-width: 20px;
+    margin-right: 20px;
+}
+
+.radio_wrapper{
+    margin: 10px 0;
+}
+
+.input_box{
+    margin-top: 5px;
+    margin-bottom: 20px;
+}
