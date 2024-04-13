@@ -15,8 +15,8 @@ export const KpiCard = ({ label, value, info = "" }: KpiCardDetailsType) => {
       ) : (
         <></>
       )}
-      <div className="kpi_card_label">{label}</div>
       <div className="kpi_card_value">{value}</div>
+      <div className="kpi_card_label">{label}</div>
     </div>
   );
 };

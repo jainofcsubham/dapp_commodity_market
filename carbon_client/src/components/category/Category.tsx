@@ -1,32 +1,18 @@
 import React, { useCallback, useEffect, useState } from "react";
 import "./Category.css";
+import { Category as CategoryType } from "../../types/Category.type";
 
-interface Question {
-  question: string;
-  answer: number;
-  type: "input" | "radio";
-  factor: number;
-  options?: Array<{
-    label: string;
-    value: number;
-    factor: number;
-  }>;
-}
 
-interface Category {
-  category: string;
-  questions: Array<Question>;
-}
 
 interface CategoryProps {
-  category: Category;
-  setCategoryAnswers: (categoryWithAnswers: Category) => void;
+  category: CategoryType;
+  setCategoryAnswers: (categoryWithAnswers: CategoryType) => void;
 }
 
 export const Category = (props: CategoryProps) => {
   const { category, setCategoryAnswers } = props;
 
-  const [localCategory, setLocalCategory] = useState<Category>(category);
+  const [localCategory, setLocalCategory] = useState<CategoryType>(category);
 
   const onNumberChange = (value: number, qIndex: number) => {
     setLocalCategory((categoryVar) => {

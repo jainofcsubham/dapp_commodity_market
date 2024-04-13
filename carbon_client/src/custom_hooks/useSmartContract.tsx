@@ -1,10 +1,10 @@
 import { BaseContractMethod } from "ethers";
 import { useContext } from "react";
-import { ErrorBarContext } from "../context/ErrorBar.context";
+import { BarContext } from "../context/Bar";
 
 export const useSmartContract = () => {
 
-    const {showError} = useContext(ErrorBarContext)
+    const {showBar} = useContext(BarContext)
 
   const callSmartContractMethod: (
     method: BaseContractMethod<any[], any, any>,
@@ -29,10 +29,10 @@ export const useSmartContract = () => {
           startIndex + 1,
           endIndex
         );
-        showError(extractedSentence);
+        showBar(extractedSentence,"error");
         return { status: "ERROR", error: extractedSentence };
       } else {
-        showError(error.message);
+        showBar(error.message,"error");
         return { status: "ERROR", error: error.message };
       }
     }

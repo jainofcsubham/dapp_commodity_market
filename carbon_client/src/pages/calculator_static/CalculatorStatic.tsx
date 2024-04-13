@@ -13,6 +13,7 @@ const staticQuestions: Array<CategoryType> = [
         answer: -1,
         type: "radio",
         factor: 0,
+        name : 'period',
         options: [
           {
             label: "Yearly",

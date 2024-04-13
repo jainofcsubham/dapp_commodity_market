@@ -3,7 +3,6 @@
     flex-grow: 1;
     display: flex;
     flex-direction: column;
-
 }
 
 .home_kpi_container{
@@ -80,4 +79,45 @@
 
 .home_tracker_body_wrapper{
     margin-bottom: 40px;
+}
+
+.home_no_emissions_wrapper{
+    display: flex;
+    justify-content: center;
+    gap: 50px
+}
+
+.home_footprint_infographic{
+    width: 300px;
+}
+
+.home_no_emissions_right{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.home_no_emissions_text{
+    font-size: 28px;
+    /* font-weight: bold; */
+    color: gray;
+    margin-bottom: 20px;
+}
+
+.home_add_emission_button{
+    margin: 0 16px;
+    font-weight: 500;
+    font-size: 16px;
+    cursor: pointer;
+    background-color: #4C8A0F;
+    border-radius: 48px;
+    padding: 14px 22px;
+    color: white;
+    border: 0;
+}
+
+.home_add_emission_button:hover{
+    background-color: #91CC49;
+
 }

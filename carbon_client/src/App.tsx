@@ -11,13 +11,14 @@ import { Landing } from "./pages/landing/Landing";
 import { Login } from "./pages/login/Login";
 import { Register } from "./pages/register/Register";
 import { ContractDetailsType } from "./types/ContractDetails.type";
-import { ErrorBarContext } from "./context/ErrorBar.context";
+import { BarContext } from "./context/Bar";
 import { Alert, Snackbar } from "@mui/material";
 import { SnackBarDetailsType } from "./types/SnackBarDetails.type";
 
 const defaultErrorBarDetails: SnackBarDetailsType = {
   isOpen: false,
   note: "",
+  type : "success"
 };
 
 export const App = () => {
@@ -31,8 +32,8 @@ export const App = () => {
     defaultErrorBarDetails
   );
 
-  const showError = (note: string) => {
-    setSnackBarDetails({ isOpen: true, note });
+  const showBar = (note: string,type : "error" | "info" | "success" | "warning") => {
+    setSnackBarDetails({ isOpen: true, note,type });
   };
 
   const hideErrorBar = () => {
@@ -40,7 +41,7 @@ export const App = () => {
   };
   const connectWallet = async () => {
     if (window.ethereum && window.ethereum.request) {
-      const contractAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
+      const contractAddress = "0xa82fF9aFd8f496c3d6ac40E2a0F282E47488CFc9";
       const contractABI = abi.abi;
       try {
         await window.ethereum.request({ method: "eth_requestAccounts" });
@@ -76,9 +77,9 @@ export const App = () => {
           contractDetails,
         }}
       >
-        <ErrorBarContext.Provider
+        <BarContext.Provider
           value={{
-            showError,
+            showBar,
           }}
         >
           <Router>
@@ -91,7 +92,7 @@ export const App = () => {
               {/* <Route path="/forgot-password" element={<Calculator />} /> */}
             </Routes>
           </Router>
-        </ErrorBarContext.Provider>
+        </BarContext.Provider>
         <Snackbar
           open={snackBarDetails.isOpen}
           autoHideDuration={6000}
@@ -100,7 +101,7 @@ export const App = () => {
         >
           <Alert
             onClose={hideErrorBar}
-            severity="error"
+            severity={snackBarDetails.type}
             variant="filled"
             sx={{ width: "100%" }}
           >

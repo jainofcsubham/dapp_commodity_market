@@ -1,6 +1,5 @@
 import "./Register.css";
 import { useNavigate } from "react-router-dom";
-import { useAxios } from "../../custom_hooks/useAxios";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useForm, SubmitHandler } from "react-hook-form";
@@ -12,6 +11,7 @@ import { UtilityContextType } from "../../types/UtilityContext.type";
 import { ContractDetailsType } from "../../types/ContractDetails.type";
 import { Contract } from "ethers";
 import { useSmartContract } from "../../custom_hooks/useSmartContract";
+import { BarContext } from "../../context/Bar";
 
 const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
 
@@ -43,9 +43,10 @@ const schema = yup
   .required();
 
 export const Register = () => {
-  const { doCall } = useAxios();
 
   const [currentTab, setCurrentTab] = useState<number>(0);
+
+  const {showBar} = useContext(BarContext)
 
   const {
     register,
@@ -82,6 +83,7 @@ export const Register = () => {
       });
       if (status == "SUCCESS" && data) {
         await data.wait();
+        showBar("Registration successful.","success")
         navigate("/");
       } else {
         console.log(error);

@@ -1,6 +1,7 @@
 export interface Question {
     question: string;
     answer: number;
+    name : string;
     type: "input" | "radio";
     options?: Array<{
       label: string;
