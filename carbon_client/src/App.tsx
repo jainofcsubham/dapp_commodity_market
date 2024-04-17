@@ -41,7 +41,7 @@ export const App = () => {
   };
   const connectWallet = async () => {
     if (window.ethereum && window.ethereum.request) {
-      const contractAddress = "0xa82fF9aFd8f496c3d6ac40E2a0F282E47488CFc9";
+      const contractAddress = "0x610178dA211FEF7D417bC0e6FeD39F05609AD788";
       const contractABI = abi.abi;
       try {
         await window.ethereum.request({ method: "eth_requestAccounts" });

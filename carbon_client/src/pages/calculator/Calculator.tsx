@@ -66,7 +66,6 @@ export const Calculator = ({ date, onFinish }: CalculatorType) => {
                   };
                 }),
               };
-              return category;
             });
           });
         } else {
