@@ -10,6 +10,7 @@ import { Contract } from "ethers";
 import { HeaderType } from "../../types/Header.type";
 import logo from "../../assets/logo.svg";
 import { useSmartContract } from "../../custom_hooks/useSmartContract";
+import { parseJSON } from "../../utility/JSONParser";
 
 export const Header = ({ isLoggedIn = false }: HeaderType) => {
   const { connectWallet, contractDetails } =
@@ -27,7 +28,27 @@ export const Header = ({ isLoggedIn = false }: HeaderType) => {
         error = "",
       } = await callSmartContractMethod(contract.loginUser);
       if (status == "SUCCESS" && data) {
-        navigate("/dashboard/home");
+        const jsonData = parseJSON(data);
+        if(jsonData[0]) {
+          navigate("/dashboard/org/home");
+          localStorage.setItem("isOrg","true");
+          localStorage.setItem("organizationDetails",JSON.stringify({
+            name : jsonData[2][0],
+            address : jsonData[2][1],
+            email : jsonData[2][2],
+          }));
+        }else{
+          navigate("/dashboard/home");
+          localStorage.setItem("isOrg","false");
+          localStorage.setItem("userDetails",JSON.stringify({
+            address : jsonData[1][0],
+            first_name : jsonData[1][1],
+            last_name : jsonData[1][2],
+            email : jsonData[1][3],
+            date_of_birth : jsonData[1][4],
+            gender : jsonData[1][5]
+          }));
+        }
       } else {
         console.log(error);
       }

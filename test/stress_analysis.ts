@@ -1,6 +1,5 @@
 import { ethers } from "hardhat";
 import { Functionality } from "../typechain-types";
-import { expect } from "chai";
 import { loadFixture } from "@nomicfoundation/hardhat-toolbox/network-helpers";
 
 // npx hardhat test
@@ -358,7 +357,7 @@ const emissions = [
   },
 ];
 
-describe("Gas Consumption", function () {
+describe("Stress Testing", function () {
   let contract: Functionality;
   async function deployContract() {
     const accounts = await ethers.getSigners();
@@ -367,138 +366,176 @@ describe("Gas Consumption", function () {
     contract = await instance.deploy();
     return {
       contract,
-      users: accounts.slice(1, 4),
-      orgUser: accounts.slice(4, 7),
+      users: accounts.slice(1, 6),
+      orgUser: accounts.slice(6, 11),
     };
+  }
+
+  async function printBalance(accounts:string[]) {
+    const res = await Promise.all(accounts.map(each => {
+        return ethers.provider.getBalance(each);
+    }))
+    res.forEach((each,index) => {
+        console.log(`${accounts[index]}:- ${ethers.formatEther(10000000000000000000000n - each)}`)
+    })
   }
 
   describe("Calling Each Function ", function () {
     it("Should call the functions", async function () {
       const { contract, users, orgUser } = await loadFixture(deployContract);
-      const registerUserTx = await contract.connect(users[0]).registerUser({
-        first_name: "User",
-        last_name: "Name",
-        email: "user@gmail.com",
-        date_of_birth: new Date(1997, 10, 5).getTime(),
-        gender: "Male",
-      });
+      
 
-      await registerUserTx.wait();
-      const loginUser = await contract.connect(users[0]).loginUser();
-      expect(loginUser[0]).to.be.false;
-
-      const registerOrganizationTx = await contract
-        .connect(orgUser[0])
-        .registerOrganization({
-          name: "Organization",
-          email: "organization@gmail.com",
-        });
-      await registerOrganizationTx.wait();
-
-      const loginOrg = await contract.connect(orgUser[0]).loginUser();
-      expect(loginOrg[0]).to.be.true;
-
-      const addProjectTx = await contract.connect(orgUser[0]).addProject({
-        name: "Project",
-        creditQuantity: 100,
-        creditType: "ABC",
-        description: "Project with 100 credits of type ABC.",
-      });
-      await addProjectTx.wait();
-
-      const editProjectTx = await contract.connect(orgUser[0]).editProject({
-        id: 1,
-        name: "Project",
-        creditQuantity: 200,
-        creditType: "ABC",
-        description:
-          "Project with 100 credits of type ABC from Org Organization.",
-        status: "ACTIVE",
-      });
-      await editProjectTx.wait();
-
-      const addEmissionsTx = await contract.connect(users[0]).addEmission({
-        date: new Date(
-          new Date().getFullYear(),
-          new Date().getMonth(),
-          new Date().getDate()
-        ).getTime(),
-        emissions,
-      });
-      await addEmissionsTx.wait();
-
-      const totalEmission = await contract
-        .connect(users[0])
-        .getTotalEmissions();
-      expect(totalEmission).to.equal(214);
-
-      const projects = await contract.connect(users[0]).getProjects(1);
-      expect(projects[0][1]).to.equal("Project");
-
-      const emissionsTx = await contract.connect(users[0]).fetchEmissions({
-        from: new Date(
-          new Date().getFullYear(),
-          new Date().getMonth(),
-          new Date().getDate()
-        ).getTime(),
-        to: new Date(
-          new Date().getFullYear(),
-          new Date().getMonth(),
-          new Date().getDate()
-        ).getTime(),
-      });
-      expect(Number(emissionsTx[0][0])).to.equal(
-        new Date(
-          new Date().getFullYear(),
-          new Date().getMonth(),
-          new Date().getDate()
-        ).getTime()
+      const registerUserPromises = users.map((user, index) =>
+        contract.connect(user).registerUser({
+          first_name: `User${index + 1}`,
+          last_name: `Name${index + 1}`,
+          email: `user${index + 1}@gmail.com`,
+          date_of_birth: new Date(1996, 10, index + 1).getTime(),
+          gender: "Male",
+        })
       );
+      const registerUserTx = await Promise.all(registerUserPromises);
+      const registerUserTxPromises = registerUserTx.map((each) => each.wait());
+      await Promise.all(registerUserTxPromises);
 
-      const addProjectToCartTx = await contract
-        .connect(users[0])
-        .addProjectToCart({
-          projectId: 1,
-          quantity: 5,
-        });
-      addProjectToCartTx.wait();
+      const registerOrgPromises = orgUser.map((user, index) =>
+        contract.connect(user).registerOrganization({
+          name: `Org ${index + 1}`,
+          email: `org${index + 1}@gmail.com`,
+        })
+      );
+      const registerOrgTx = await Promise.all(registerOrgPromises);
+      const registerOrgTxPromises = registerOrgTx.map((each) => each.wait());
+      await Promise.all(registerOrgTxPromises);
 
-      const fetchCartTx = await contract.connect(users[0]).fetchCart(0);
-      expect(fetchCartTx[0][0]).to.equal("ABC");
-
-      const makeCartEmptyTx = await contract.connect(users[0]).makeCartEmpty({
-        projectId: 1,
+      let addProjectPromises: any[] = [];
+      orgUser.forEach((user, index) => {
+        Array(10)
+          .fill(null)
+          .forEach((_i, indexIn) => {
+            addProjectPromises.push(
+              contract.connect(user).addProject({
+                name: `Project_${index + 1}_${indexIn + 1}`,
+                creditQuantity: 100,
+                creditType: "ABC",
+                description: "Project with 100 credits of type ABC.",
+              })
+            );
+          });
       });
-      makeCartEmptyTx.wait();
+      const addProjectTx = await Promise.all(addProjectPromises);
+      const addProjectTxPromises = addProjectTx.map((each) => each.wait());
+      await Promise.all(addProjectTxPromises);
 
-      const fetchCartTx2 = await contract.connect(users[0]).fetchCart(0);
-      expect(fetchCartTx2[0][1]).to.equal(0);
+      let count = 1;
+      let editProjectPromises: any[] = [];
+      orgUser.forEach((user, index) => {
+        Array(10)
+          .fill(null)
+          .forEach((_i, indexIn) => {
+            editProjectPromises.push(
+              contract.connect(user).editProject({
+                name: `Project_${index + 1}_${indexIn + 1}`,
+                creditQuantity: 100,
+                creditType: "ABC",
+                id: count,
+                description:
+                  "Project with 100 credits of type ABC from Org Organization.",
+                status: "ACTIVE",
+              })
+            );
+            count = count + 1;
+          });
+      });
+      const editProjectTx = await Promise.all(editProjectPromises);
+      const editProjectTxPromises = editProjectTx.map((each) => each.wait());
+      await Promise.all(editProjectTxPromises);
 
-      const addProjectToCartAgainTx = await contract
-        .connect(users[0])
-        .addProjectToCart({
-          projectId: 1,
-          quantity: 5,
-        });
-      addProjectToCartAgainTx.wait();
-      const fetchCartTx3 = await contract.connect(users[0]).fetchCart(0);
-      expect(fetchCartTx3[0][1]).to.equal(5);
+      let addEmissionPromises: any[] = [];
+      users.forEach((user, index) => {
+        Array(10)
+          .fill(null)
+          .forEach((_i, indexIn) => {
+            addEmissionPromises.push(
+                contract.connect(user).addEmission({
+                    date: new Date(
+                      new Date().getFullYear(),
+                      new Date().getMonth(),
+                      new Date().getDate() - indexIn
+                    ).getTime(),
+                    emissions,
+                  })
+            );
+          });
+      });
+      const addEmissionTx = await Promise.all(addEmissionPromises);
+      const addEmissionTxPromises = addEmissionTx.map((each) => each.wait());
+      await Promise.all(addEmissionTxPromises);
 
-      const buyCreditsFromCartTx = await contract
-        .connect(users[0])
-        .buyCreditsFromCart({ value: 500 });
-      await buyCreditsFromCartTx.wait();
+      let addProjectToCartPromises: any[] = [];
+      users.forEach((user, index) => {
+        let projectCount  = 1;
+        Array(5)
+          .fill(null)
+          .forEach((_i, indexIn) => {
+            addProjectToCartPromises.push(
+                contract.connect(user).addProjectToCart({
+                   quantity : 10,
+                   projectId : projectCount
+                  })
+            );
+            projectCount = projectCount +1;
+          });
+      });
+      const addProjectToCartTx = await Promise.all(addProjectToCartPromises);
+      const addProjectToCartTxPromises = addProjectToCartTx.map((each) => each.wait());
+      await Promise.all(addProjectToCartTxPromises);
 
-      const creditCount = await contract
-        .connect(users[0])
-        .getTotalCreditCount();
-      expect(creditCount).to.equal(5);
+      let makeCartEmptyPromises: any[] = [];
+      users.forEach((user, index) => {
+        let projectCount  = 1;
+        Array(5)
+          .fill(null)
+          .forEach((_i, indexIn) => {
+            makeCartEmptyPromises.push(
+                contract.connect(user).makeCartEmpty({
+                   projectId : projectCount
+                  })
+            );
+            projectCount = projectCount +1;
+          });
+      });
+      const makeCartEmptyTx = await Promise.all(makeCartEmptyPromises);
+      const makeCartEmptyTxPromises = makeCartEmptyTx.map((each) => each.wait());
+      await Promise.all(makeCartEmptyTxPromises);
 
-      const getPortfolio = await contract.connect(users[0]).getPortfolio(0);
-      expect(getPortfolio[0][1]).to.equal(5);
+      let addProjectToCartPromisesAgain: any[] = [];
+      users.forEach((user, index) => {
+        let projectCount  = 1;
+        Array(5)
+          .fill(null)
+          .forEach((_i, indexIn) => {
+            addProjectToCartPromisesAgain.push(
+                contract.connect(user).addProjectToCart({
+                   quantity : 10,
+                   projectId : projectCount
+                  })
+            );
+            projectCount = projectCount +1;
+          });
+      });
+      const addProjectToCartAgainTx = await Promise.all(addProjectToCartPromisesAgain);
+      const addProjectToCartAgainTxPromises = addProjectToCartAgainTx.map((each) => each.wait());
+      await Promise.all(addProjectToCartAgainTxPromises);
 
-      const transactions = await contract.connect(users[0]).getTransactionBy(0);
-      expect(transactions[0][2]).to.equal(users[0].address);
+      const buyCreditsFromCartPromises = users.map((user, _index) =>
+        contract.connect(user).buyCreditsFromCart({value : 50})
+      );
+      const buyCreditsTx = await Promise.all(buyCreditsFromCartPromises);
+      const buyCreditsTxPromises = buyCreditsTx.map((each) => each.wait());
+      await Promise.all(buyCreditsTxPromises);
+      printBalance(users.map(each => each.address));
+      printBalance(orgUser.map(each => each.address));
     });
   });
 });

@@ -26,3 +26,13 @@ Account 7:- 0x67dB0AF41223A0112eC599eeD0AE592Ce04052F9
 Account 8:- 0x422499749abAe9D4A93626e7cC46CE21529056e2
 Account 9:- 0xf045A3D0E28a480b2AB653d6C5f90F237C346210
 Account 10:- 0x2e39E233C585b93ceD15548c60e9ee6D79a553E0
+
+// Sepolia test net
+Carbon Footprint Final Contract Deployed at :- 0x0918efA03dC9deEaE062812CF86b5a6BdAD7d29A - 1st try
+Carbon Footprint Final Contract Deployed at :- 0x9AeB3737297b5aEc280F13Ca953b2B4A5262056B - 2nd try
+Carbon Footprint Final Contract Deployed at :- 0x4d7c0496F1e37A0097Ea91f5b3362d6e2E05D1e3 - 3rd try
+Carbon Footprint Final Contract Deployed at :- 0x130602a273BeD0Ad412682E039985FB3c75A9499 - 4th try
+Carbon Footprint Final Contract Deployed at :- 0x001A06a03C44A8fC6c70ac50f17E0edF95B31750 - 5th try
+Carbon Footprint Final Contract Deployed at :- 0x2e0593d3F55a726c1A2B781F99062E17d21e0549 - 6th try
+Carbon Footprint Final Contract Deployed at :- 0xe429d3a9409A804e3BB32700A09E5648D23634F9 - 7th try
+Carbon Footprint Final Contract Deployed at :- 0x4F503a8D6B683A2784Ec0C065860508abEC97b5a - 8th try

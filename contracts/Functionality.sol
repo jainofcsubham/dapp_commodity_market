@@ -4,34 +4,26 @@ pragma solidity ^0.8.25;
 import "./Database.sol";
 
 contract Functionality is Database {
-    bool internal locked;
-    modifier reentrancyGuard() {
-        require(!locked);
-        locked = true;
-        _;
-        locked = false;
-    }
 
     // Utility function 
-
     function ceil(uint256 numerator, uint256 denominator) public pure returns (uint256) {
         return (numerator + denominator - 1) / denominator;
     }
 
     // Third party functions 
-    function validateProjectCredits() private pure returns (bool){
+    function validateProjectCredits() internal pure returns (bool){
         return true;
     }
 
-    function getCreditPrice () private pure returns (uint256) {
-        return 100;
+    function getCreditPrice () internal pure returns (uint256) {
+        return 1;
     }
 
     // Modifiers
 
     modifier validateUser(address addr) {
         require(
-            bytes(user_list[addr].first_name).length != 0,
+            bytes(userList[addr].first_name).length != 0,
             "User doesn't exist. Please register."
         );
         _;
@@ -39,7 +31,7 @@ contract Functionality is Database {
 
     modifier validateOrg(address addr) {
         require(
-            bytes(organization_list[addr].name).length != 0,
+            bytes(organizationList[addr].name).length != 0,
             "Organization doesn't exist. Please register."
         );
         _;
@@ -47,14 +39,14 @@ contract Functionality is Database {
 
     modifier validateOrgOrUser(address addr) {
         require(
-            bytes(user_list[addr].first_name).length != 0 || bytes(organization_list[addr].name).length != 0,
+            bytes(userList[addr].first_name).length != 0 || bytes(organizationList[addr].name).length != 0,
             "Invalid Login!! Please register."
         );
         _;
     }
 
     function registerUser(
-        Data_Types.RegisterUserType memory args
+        DataTypes.RegisterUserType memory args
     ) external returns (bool) {
         // Validation
         require(
@@ -67,9 +59,9 @@ contract Functionality is Database {
         require(args.date_of_birth != 0, "DOB cannot be empty");
 
         // Logic
-        Data_Types.User memory user = user_list[msg.sender];
+        DataTypes.User memory user = userList[msg.sender];
         require(
-            bytes(user_list[msg.sender].first_name).length == 0,
+            bytes(userList[msg.sender].first_name).length == 0,
             "User already registered."
         );
         user.first_name = args.first_name;
@@ -86,32 +78,41 @@ contract Functionality is Database {
         external
         view
         validateOrgOrUser(msg.sender)
-        returns (bool)
+        returns (DataTypes.LoginReturnType memory)
     {
-        return true;
+        DataTypes.LoginReturnType memory res;
+        if(bytes(userList[msg.sender].first_name).length != 0) {
+            res.user = userList[msg.sender]; 
+            res.isOrg = false;
+        }
+        else if(bytes(organizationList[msg.sender].name).length != 0) {
+            res.org = organizationList[msg.sender]; 
+            res.isOrg = true;
+        }
+        return res;
     }
 
     function addEmission(
-        Data_Types.AddEmissionType memory args
+        DataTypes.AddEmissionType memory args
     ) external validateUser(msg.sender) returns (bool) {
         return addEmissionToList(args.date, args.emissions, msg.sender);
     }
 
     function fetchEmissions(
-        Data_Types.FetchEmissionsType memory args
-    ) external validateUser(msg.sender) view returns (Data_Types.DateEmission[10] memory) {
-        Data_Types.DateEmission[10] memory emission_history;
+        DataTypes.FetchEmissionsType memory args
+    ) external validateUser(msg.sender) view returns (DataTypes.DateEmission[10] memory) {
+        DataTypes.DateEmission[10] memory emission_history;
         uint256 step = 24 * 3600 * 1000;
         uint256 index = 0;
         for (uint256 i = args.from; i <= args.to; i = i + step) {
-            if (!(user_emissions[msg.sender][i].length != 0)) {
+            if (!(userEmissions[msg.sender][i].length != 0)) {
                 continue;
             }
-            Data_Types.DateEmission memory temp;
+            DataTypes.DateEmission memory temp;
             temp.date = i;
-            uint256 size = user_emissions[msg.sender][i].length;
+            uint256 size = userEmissions[msg.sender][i].length;
             for(uint256 j=0;j<size;){
-                temp.emission[j] = user_emissions[msg.sender][i][j];
+                temp.emission[j] = userEmissions[msg.sender][i][j];
                 unchecked{
                     ++j;
                 }
@@ -123,16 +124,16 @@ contract Functionality is Database {
     }
 
     function registerOrganization(
-        Data_Types.RegisterOrgType memory args
+        DataTypes.RegisterOrgType memory args
     ) external returns (bool) {
         // Validation
         require(bytes(args.name).length != 0, "Name cannot be empty");
         require(bytes(args.email).length != 0, "Email cannot be empty");
 
         // Logic
-        Data_Types.Organization memory org = organization_list[msg.sender];
+        DataTypes.Organization memory org = organizationList[msg.sender];
         require(
-            bytes(organization_list[msg.sender].name).length == 0,
+            bytes(organizationList[msg.sender].name).length == 0,
             "Organization already registered."
         );
         org.name = args.name;
@@ -143,15 +144,15 @@ contract Functionality is Database {
     }
 
 
-    function addProject(Data_Types.ProjectType memory args) external validateOrg(msg.sender) returns (bool) {
+    function addProject(DataTypes.ProjectType memory args) external validateOrg(msg.sender) returns (bool) {
         require(bytes(args.name).length != 0, "Name cannot be empty");
         require(bytes(args.description).length != 0, "Description cannot be empty.");
         require(bytes(args.creditType).length != 0, "Credit Type must be provided.");
         require(args.creditQuantity != 0, "Quantity must be more than zero.");
         // Verify credits from third party libraries/wallets
         require(validateProjectCredits(),"Credits could not be verified.");
-        uint256 project_id = project_id_list.length + 1;
-        Data_Types.Project memory project;
+        uint256 project_id = projectIdList.length + 1;
+        DataTypes.Project memory project;
         project.name = args.name;
         project.description = args.description;
         project.id = project_id;
@@ -162,9 +163,9 @@ contract Functionality is Database {
         return addProjectToList(project_id,project);
     }
 
-    function editProject(Data_Types.EditProjectType memory args) external validateOrg(msg.sender)  returns (bool) {
-        require(bytes(project_list[args.id].name).length != 0,"Project doesn't exist.");
-        require(project_list[args.id].org_id == msg.sender,"Project doesn't exist.");
+    function editProject(DataTypes.EditProjectType memory args) external validateOrg(msg.sender)  returns (bool) {
+        require(bytes(projectList[args.id].name).length != 0,"Project doesn't exist.");
+        require(projectList[args.id].org_id == msg.sender,"Project doesn't exist.");
         require(bytes(args.name).length != 0, "Name cannot be empty");
         require(keccak256(abi.encodePacked(args.status)) == keccak256(abi.encodePacked("ACTIVE")) || keccak256(abi.encodePacked(args.status)) == keccak256(abi.encodePacked("INACTIVE")), "Status is invalid.");
         require(bytes(args.description).length != 0, "Description cannot be empty.");
@@ -174,17 +175,17 @@ contract Functionality is Database {
         return editProjectFromList(args.id,args.name,args.description,args.status);
     }
 
-    function addProjectToCart(Data_Types.AddProjectToCartType memory args) external validateUser(msg.sender)  returns (bool) {
+    function addProjectToCart(DataTypes.AddProjectToCartType memory args) external validateUser(msg.sender)  returns (bool) {
         require(args.quantity != 0, "Quantity must be more than zero.");
-        require(bytes(project_list[args.projectId].name).length != 0,"Invalid Project");
-        require(keccak256(abi.encodePacked(project_list[args.projectId].status)) == keccak256(abi.encodePacked("ACTIVE")),"Invalid Project");
-        string memory creditType = project_list[args.projectId].creditType;
-        uint256 oldQuantity = user_cart_list[msg.sender][args.projectId].isCartEmpty ? 0 : user_cart_list[msg.sender][args.projectId].creditQuantityInCart;
-        require(project_list[args.projectId].creditQuantity + 1 > args.quantity +oldQuantity ,"Cannot add to cart.");
+        require(bytes(projectList[args.projectId].name).length != 0,"Invalid Project");
+        require(keccak256(abi.encodePacked(projectList[args.projectId].status)) == keccak256(abi.encodePacked("ACTIVE")),"Invalid Project");
+        string memory creditType = projectList[args.projectId].creditType;
+        uint256 oldQuantity = userCartList[msg.sender][args.projectId].isCartEmpty ? 0 : userCartList[msg.sender][args.projectId].creditQuantityInCart;
+        require(projectList[args.projectId].creditQuantity + 1 > args.quantity +oldQuantity ,"Cannot add to cart.");
         return addProjectToCartDB(args,creditType);
     }
 
-    function makeCartEmpty(Data_Types.MakeCartEmptyType memory args) external validateUser(msg.sender) returns  (bool) {
+    function makeCartEmpty(DataTypes.MakeCartEmptyType memory args) external validateUser(msg.sender) returns  (bool) {
         return makeUserCartEmpty(args.projectId);
     }
 
@@ -192,14 +193,14 @@ contract Functionality is Database {
         uint256 isEmptyCart = 0;
         uint256 inStock = 1;    
         uint256 totalPrice = 0;
-        uint256 size = user_cart_id_list[msg.sender].length;
+        uint256 size = userCartIdList[msg.sender].length;
         for(uint256 i=0;i<size;){
-            uint256 projectId = user_cart_id_list[msg.sender][i];
-            if(user_cart_list[msg.sender][projectId].creditQuantityInCart != 0){
+            uint256 projectId = userCartIdList[msg.sender][i];
+            if(userCartList[msg.sender][projectId].creditQuantityInCart != 0){
                 isEmptyCart = 1;
-                totalPrice = totalPrice + (user_cart_list[msg.sender][projectId].creditQuantityInCart * getCreditPrice() );
+                totalPrice = totalPrice + (userCartList[msg.sender][projectId].creditQuantityInCart * getCreditPrice() );
             }
-            if(project_list[projectId].creditQuantity < user_cart_list[msg.sender][projectId].creditQuantityInCart){
+            if(projectList[projectId].creditQuantity < userCartList[msg.sender][projectId].creditQuantityInCart){
                 inStock = 0;
             }
             unchecked {
@@ -212,9 +213,9 @@ contract Functionality is Database {
         require(totalPrice == msg.value, "Invalid amount");
         transferCredits();
         for(uint256 i=0;i<size;){
-            uint256 projectId = user_cart_id_list[msg.sender][i];
-            address payable orgAddress = payable(project_list[user_cart_id_list[msg.sender][i]].org_id);
-            uint256 amount = user_cart_list[msg.sender][projectId].creditQuantityInCart * getCreditPrice() ;
+            uint256 projectId = userCartIdList[msg.sender][i];
+            address payable orgAddress = payable(projectList[userCartIdList[msg.sender][i]].org_id);
+            uint256 amount = userCartList[msg.sender][projectId].creditQuantityInCart * getCreditPrice() ;
             orgAddress.transfer(amount);
             unchecked
             {
@@ -225,15 +226,15 @@ contract Functionality is Database {
         return true;
     }
 
-    function fetchCart(uint256 fromIndex) external view validateUser(msg.sender)  returns (Data_Types.CartDetails[10] memory) {
-        uint256 size= user_cart_id_list[msg.sender].length;
+    function fetchCart(uint256 fromIndex) external view validateUser(msg.sender)  returns (DataTypes.CartDetails[10] memory) {
+        uint256 size= userCartIdList[msg.sender].length;
         require(fromIndex < size + 1,"Invalid request.");
-        Data_Types.CartDetails[10] memory cartList;
+        DataTypes.CartDetails[10] memory cartList;
         if(size == 0) return cartList;
         uint256 startIndex = fromIndex == 0 ? size -1 : fromIndex-1 ;
         uint256 index =0;
         while(index < 10 && startIndex >= 0 && startIndex < size){
-            cartList[index] = user_cart_list[msg.sender][user_cart_id_list[msg.sender][startIndex]];
+            cartList[index] = userCartList[msg.sender][userCartIdList[msg.sender][startIndex]];
             if(startIndex == 0) break;
             startIndex--;
             ++index;
@@ -242,15 +243,15 @@ contract Functionality is Database {
 
     }
 
-    function getPortfolio(uint256 fromIndex) external view validateUser(msg.sender)  returns (Data_Types.CreditDetails[10] memory) {
-        uint256 size= user_credit_type_list[msg.sender].length;
+    function getPortfolio(uint256 fromIndex) external view validateUser(msg.sender)  returns (DataTypes.CreditDetails[10] memory) {
+        uint256 size= userCreditTypeList[msg.sender].length;
         require(fromIndex < size + 1,"Invalid request.");
-        Data_Types.CreditDetails[10] memory credits;
+        DataTypes.CreditDetails[10] memory credits;
         if(size == 0) return credits;
         uint256 startIndex = fromIndex == 0 ? size -1 : fromIndex-1 ;
         uint256 index =0;
         while(index < 10 && startIndex >= 0 && startIndex < size){
-            credits[index] = user_credit_list[msg.sender][user_credit_type_list[msg.sender][startIndex]];
+            credits[index] = userCreditList[msg.sender][userCreditTypeList[msg.sender][startIndex]];
             if(startIndex == 0) break;
             startIndex--;
             ++index;
@@ -261,10 +262,10 @@ contract Functionality is Database {
 
     function getTotalCreditCount() external view validateUser(msg.sender) returns (uint256) {
         uint256 ans=0;
-        uint256 size = user_credit_type_list[msg.sender].length;
+        uint256 size = userCreditTypeList[msg.sender].length;
         for(uint256 i=0;i<size;){
-            string memory creditType = user_credit_type_list[msg.sender][i];
-            ans = ans + user_credit_list[msg.sender][creditType].creditQuantityInPortfolio;
+            string memory creditType = userCreditTypeList[msg.sender][i];
+            ans = ans + userCreditList[msg.sender][creditType].creditQuantityInPortfolio;
             unchecked {
                     ++i;
             }
@@ -272,20 +273,20 @@ contract Functionality is Database {
         return ans;
     }
 
-    function getProjects(uint256 pageNumber) external view validateUser(msg.sender) returns (Data_Types.Project[10] memory) {
+    function getProjects(uint256 pageNumber) external view validateUser(msg.sender) returns (DataTypes.Project[10] memory) {
         require(pageNumber != 0,"Page number cannot be 0."  );
-        require(pageNumber < ceil(project_id_list.length,10) + 1,"No more projects");
+        require(pageNumber < ceil(projectIdList.length,10) + 1,"No more projects");
 
-        Data_Types.Project[10] memory projects;
+        DataTypes.Project[10] memory projects;
         uint256 start = ((pageNumber-1)*10); 
         uint256 end = start + 10;
-        uint256 projectsSize = project_id_list.length;
+        uint256 projectsSize = projectIdList.length;
         if(end >= projectsSize){
             end = projectsSize - 1;
         }
         uint256 index =0;
         for(uint256 i= start;i<=end;){
-            projects[index] = project_list[project_id_list[i]];
+            projects[index] = projectList[projectIdList[i]];
             unchecked{
                 ++index;
                 ++i;
@@ -294,16 +295,16 @@ contract Functionality is Database {
         return projects;
     }
 
-    function getTransactionBy(uint256 fromIndex) external view validateOrgOrUser(msg.sender) returns (Data_Types.Transaction[10] memory) {
-        require(fromIndex < transaction_id_list.length + 1,"Invalid request.");
-        uint256 size = transaction_id_list.length;
-        Data_Types.Transaction[10] memory transactions;
+    function getTransactionBy(uint256 fromIndex) external view validateOrgOrUser(msg.sender) returns (DataTypes.Transaction[10] memory) {
+        require(fromIndex < transactionIdList.length + 1,"Invalid request.");
+        uint256 size = transactionIdList.length;
+        DataTypes.Transaction[10] memory transactions;
         if(size == 0) return transactions;
         uint256 startIndex = fromIndex == 0 ? size -1 : fromIndex-1 ;
         uint256 index =0;
         while(index < 10 && startIndex >= 0 && startIndex < size){
-            if(transaction_list[transaction_id_list[startIndex]].user_id == msg.sender || transaction_list[transaction_id_list[startIndex]].org_id == msg.sender){
-                transactions[index] = transaction_list[transaction_id_list[startIndex]];
+            if(transactionList[transactionIdList[startIndex]].user_id == msg.sender || transactionList[transactionIdList[startIndex]].org_id == msg.sender){
+                transactions[index] = transactionList[transactionIdList[startIndex]];
             }
             if(startIndex == 0) break;
             startIndex--;
@@ -314,13 +315,13 @@ contract Functionality is Database {
 
     function getTotalEmissions() external view validateUser(msg.sender) returns (uint256) {
         uint256 ans = 0;
-        uint256 size = user_emission_date_list[msg.sender].length;
+        uint256 size = userEmissionDateList[msg.sender].length;
         for(uint256 i=0;i<size;){
-            uint256 date = user_emission_date_list[msg.sender][i];
-            uint256 arraySieze =  user_emissions[msg.sender][date].length;
+            uint256 date = userEmissionDateList[msg.sender][i];
+            uint256 arraySieze =  userEmissions[msg.sender][date].length;
             for(uint256 j=0;j<arraySieze;){
-                if(bytes(user_emissions[msg.sender][date][j].category).length != 0){
-                    ans = ans + user_emissions[msg.sender][date][j].emission_value;
+                if(bytes(userEmissions[msg.sender][date][j].category).length != 0){
+                    ans = ans + userEmissions[msg.sender][date][j].emission_value;
                 }
                 unchecked {
                     ++j;

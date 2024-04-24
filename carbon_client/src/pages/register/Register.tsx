@@ -90,9 +90,28 @@ export const Register = () => {
       }
     }
   }
+
+
+  const callRegisterOrgMethod = async (contract: Contract | null,args : RegisterOrganizationCredentialsType) => {
+    if (contract) {
+      const {
+        status,
+        data = "",
+        error = "",
+      } = await callSmartContractMethod(contract.registerOrganization,true, {
+       ...args,
+      });
+      if (status == "SUCCESS" && data) {
+        await data.wait();
+        showBar("Registration successful.","success")
+        navigate("/");
+      } else {
+        console.log(error);
+      }
+    }
+  }
   
   const handleRegister: SubmitHandler<RegisterIndividualCredentialsType> = async (data) => {
-
     if (!contractDetails.contract) {
       const { contract }: ContractDetailsType = await connectWallet();
       await callRegisterMethod(contract,data);
@@ -102,21 +121,12 @@ export const Register = () => {
   };
 
   const handleRegisterOrganization: SubmitHandler<RegisterOrganizationCredentialsType> = async (data) => {
-    // const res = await doCall({
-    //   url: "/register",
-    //   method: "POST",
-    //   data: {
-    //     ...data,
-    //     date_of_birth: moment(data.date_of_birth).format("YYYY-MM-DD"),
-    //   },
-    // });
-    // if (res.res && res.status == "success") {
-    //   nav("/login");
-    // } else {
-    //   alert("Something went wrong!! Please try again.");
-    // }
-
-    // Register Org
+    if (!contractDetails.contract) {
+      const { contract }: ContractDetailsType = await connectWallet();
+      await callRegisterOrgMethod(contract,data);
+    } else {
+      await callRegisterOrgMethod(contract,data);
+    }
   };
 
   const changeTab = (_event: React.SyntheticEvent, newValue: number) => {

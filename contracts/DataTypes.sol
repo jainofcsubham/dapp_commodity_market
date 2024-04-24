@@ -3,16 +3,8 @@
 pragma solidity ^0.8.25;
 
 
-library  Data_Types {
+library  DataTypes {
 
-    struct Emission {
-        string category;
-        string factor_name;
-        string value;
-        string value_type;
-        uint256 emission_value;
-    }
-    
     struct User{
         address user_address;
         string first_name;
@@ -22,38 +14,10 @@ library  Data_Types {
         string gender;
     }
 
-    struct DateEmission {
-        uint256 date;
-        Emission[50] emission;
-    }
-
-    struct RegisterUserType {
-        string  first_name;
-        string  last_name;
-        string  email;
-        uint256  date_of_birth;
-        string  gender;
-    }
-
-    struct AddEmissionType {
-        uint256 date;
-        Data_Types.Emission[50] emissions; 
-    }
-
-    struct FetchEmissionsType {
-        uint256 from;
-        uint256 to;
-    }
-
     struct Organization {
         string name;
         address id;
         string email;
-    }
-
-    struct RegisterOrgType {
-        string  name;
-        string  email;
     }
 
     struct Project {
@@ -66,20 +30,17 @@ library  Data_Types {
         string creditType;
     }
 
-    struct  ProjectType {
-        string name;
-        string description;
-        string creditType;
-        uint256 creditQuantity;
+    struct Emission {
+        string category;
+        string factor_name;
+        string value;
+        string value_type;
+        uint256 emission_value;
     }
 
-    struct  EditProjectType {
-        uint256 id;
-        string name;
-        string description;
-        string status; 
-        string creditType;
-        uint256 creditQuantity;
+    struct DateEmission {
+        uint256 date;
+        Emission[50] emission;
     }
 
     struct Transaction {
@@ -105,6 +66,51 @@ library  Data_Types {
 
     }
 
+    struct RegisterUserType {
+        string  first_name;
+        string  last_name;
+        string  email;
+        uint256  date_of_birth;
+        string  gender;
+    }
+
+    struct AddEmissionType {
+        uint256 date;
+        DataTypes.Emission[50] emissions; 
+    }
+
+    struct FetchEmissionsType {
+        uint256 from;
+        uint256 to;
+    }
+
+   
+
+    struct RegisterOrgType {
+        string  name;
+        string  email;
+    }
+
+
+
+    struct  ProjectType {
+        string name;
+        string description;
+        string creditType;
+        uint256 creditQuantity;
+    }
+
+    struct  EditProjectType {
+        uint256 id;
+        string name;
+        string description;
+        string status; 
+        string creditType;
+        uint256 creditQuantity;
+    }
+
+    
+
     struct AddProjectToCartType{
         uint256 projectId;
         uint256 quantity;
@@ -112,6 +118,12 @@ library  Data_Types {
 
     struct MakeCartEmptyType {
         uint256 projectId;
+    }
+
+    struct LoginReturnType {
+        bool isOrg ;
+        User user;
+        Organization org;
     }
 
 }
